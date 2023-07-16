@@ -19,7 +19,8 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	HelloWorld_SayHello_FullMethodName = "/pb.HelloWorld/SayHello"
+	HelloWorld_SayHello_FullMethodName  = "/pb.HelloWorld/SayHello"
+	HelloWorld_Factorial_FullMethodName = "/pb.HelloWorld/Factorial"
 )
 
 // HelloWorldClient is the client API for HelloWorld service.
@@ -28,6 +29,7 @@ const (
 type HelloWorldClient interface {
 	// Sends the SayHello message
 	SayHello(ctx context.Context, in *HelloRequest, opts ...grpc.CallOption) (*HelloResponse, error)
+	Factorial(ctx context.Context, in *FactorialRequest, opts ...grpc.CallOption) (*FactorialResponse, error)
 }
 
 type helloWorldClient struct {
@@ -47,12 +49,22 @@ func (c *helloWorldClient) SayHello(ctx context.Context, in *HelloRequest, opts 
 	return out, nil
 }
 
+func (c *helloWorldClient) Factorial(ctx context.Context, in *FactorialRequest, opts ...grpc.CallOption) (*FactorialResponse, error) {
+	out := new(FactorialResponse)
+	err := c.cc.Invoke(ctx, HelloWorld_Factorial_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // HelloWorldServer is the server API for HelloWorld service.
 // All implementations must embed UnimplementedHelloWorldServer
 // for forward compatibility
 type HelloWorldServer interface {
 	// Sends the SayHello message
 	SayHello(context.Context, *HelloRequest) (*HelloResponse, error)
+	Factorial(context.Context, *FactorialRequest) (*FactorialResponse, error)
 	mustEmbedUnimplementedHelloWorldServer()
 }
 
@@ -62,6 +74,9 @@ type UnimplementedHelloWorldServer struct {
 
 func (UnimplementedHelloWorldServer) SayHello(context.Context, *HelloRequest) (*HelloResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SayHello not implemented")
+}
+func (UnimplementedHelloWorldServer) Factorial(context.Context, *FactorialRequest) (*FactorialResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Factorial not implemented")
 }
 func (UnimplementedHelloWorldServer) mustEmbedUnimplementedHelloWorldServer() {}
 
@@ -94,6 +109,24 @@ func _HelloWorld_SayHello_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
+func _HelloWorld_Factorial_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FactorialRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HelloWorldServer).Factorial(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: HelloWorld_Factorial_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HelloWorldServer).Factorial(ctx, req.(*FactorialRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // HelloWorld_ServiceDesc is the grpc.ServiceDesc for HelloWorld service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -104,6 +137,10 @@ var HelloWorld_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SayHello",
 			Handler:    _HelloWorld_SayHello_Handler,
+		},
+		{
+			MethodName: "Factorial",
+			Handler:    _HelloWorld_Factorial_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

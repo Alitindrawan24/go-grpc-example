@@ -38,4 +38,12 @@ func main() {
 		log.Fatalf("could not say: %v", err)
 	}
 	log.Printf("Say: %s", r.GetMessage())
+
+	ctx, cancel = context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+	result, err := c.Factorial(ctx, &pb.FactorialRequest{Number: 10})
+	if err != nil {
+		log.Fatalf("could not say: %v", err)
+	}
+	log.Printf("Factorial : %d", result.GetNumber())
 }

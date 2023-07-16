@@ -23,6 +23,16 @@ func (s *server) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloRe
 	return &pb.HelloResponse{Message: "Hello " + in.GetName()}, nil
 }
 
+func (s *server) Factorial(ctx context.Context, in *pb.FactorialRequest) (*pb.FactorialResponse, error) {
+	log.Printf("Received: %v", in.GetNumber())
+	fact := int64(1)
+	for i := int64(1); i <= in.GetNumber(); i++ {
+		fact = fact * i
+	}
+
+	return &pb.FactorialResponse{Number: int64(fact)}, nil
+}
+
 func main() {
 	lis, err := net.Listen("tcp", port)
 	if err != nil {

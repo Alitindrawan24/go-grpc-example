@@ -8,6 +8,7 @@ package pb;
 service HelloWorld {
     // Sends the SayHello message
     rpc SayHello (HelloRequest) returns (HelloResponse) {}
+    rpc Factorial (FactorialRequest) returns (FactorialResponse) {}
 }
 
 // The request message containing a name(Client-side)
@@ -18,4 +19,12 @@ message HelloRequest {
 // The response message containing a message(Server-side)
 message HelloResponse {
     string message = 1;
+}
+
+message FactorialRequest {
+    int64 number = 1;
+}
+
+message FactorialResponse {
+    int64 number = 1;
 }
